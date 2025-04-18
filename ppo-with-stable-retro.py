@@ -7,7 +7,7 @@ import argparse
 import gymnasium as gym
 import numpy as np
 
-from stable_baselines3 import PPO
+from ppo import PPO
 from stable_baselines3.common.atari_wrappers import ClipRewardEnv, WarpFrame
 from stable_baselines3.common.vec_env import (
     SubprocVecEnv,
