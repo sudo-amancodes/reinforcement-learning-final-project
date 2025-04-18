@@ -6,8 +6,9 @@ import argparse
 
 import gymnasium as gym
 import numpy as np
+import torch
 
-from ppo import PPO
+from ppo import PPOAgent
 from stable_baselines3.common.atari_wrappers import ClipRewardEnv, WarpFrame
 from stable_baselines3.common.vec_env import (
     SubprocVecEnv,
@@ -89,24 +90,26 @@ def main():
         env = wrap_deepmind_retro(env)
         return env
 
-    venv = VecTransposeImage(VecFrameStack(SubprocVecEnv([make_env] * 8), n_stack=4))
-    model = PPO(
-        policy="CnnPolicy",
-        env=venv,
-        learning_rate=lambda f: f * 2.5e-4,
-        n_steps=128,
-        batch_size=32,
-        n_epochs=4,
-        gamma=0.99,
-        gae_lambda=0.95,
-        clip_range=0.1,
-        ent_coef=0.01,
-        verbose=1,
+    n_envs = 8
+    rollout_length = 256
+    total_updates  = 500
+    envs= VecTransposeImage(VecFrameStack(SubprocVecEnv([make_env] * 8), n_stack=4))
+    
+
+    obs_shape   = envs.observation_space.shape
+    
+    obs_dim = int(np.prod(obs_shape))    
+    num_buttons   = envs.action_space.n
+
+    agent = PPOAgent(
+        obs_dim, num_buttons,
+        lr=3e-4, gamma=0.99,
+        clip_eps=0.2, epochs=4,
+        n_envs=n_envs,
+        rollout_length=rollout_length,
+        device="cuda" if torch.cuda.is_available() else "cpu"
     )
-    model.learn(
-        total_timesteps=100_000_000,
-        log_interval=1,
-    )
+    agent.train(envs, total_updates)
 
 
 if __name__ == "__main__":
