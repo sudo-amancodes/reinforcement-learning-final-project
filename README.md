@@ -4,17 +4,6 @@ A lightweight implementation of Proximal Policy Optimization (PPO) for Atari‑s
 
 ---
 
-## Repository Structure
-
-rl-stable-retro-ppo/ 
-├── ppo-with-stable-retro.py # Train PPO on retro games (e.g. Sega Genesis) 
-├── ppo.py # PPO agent implementation & example on Gym tasks 
-├── requirements.txt # Python dependencies 
-└── README.md # This file
-
-
----
-
 ## Features
 
 - **Custom PPOAgent**  
